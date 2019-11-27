@@ -1,13 +1,12 @@
 import random
-from math import ceil
 
-NUMBER_OF_ITERATIONS = 30
+NUMBER_OF_ITERATIONS = 20
 AMOUNT_OF_FOOD = 50
 SHARING_HAPPENS = 0.5
-A_POPULATION_GROWTH = 0.3
-B_POPULATION_GROWTH = 0.3
-A_INIT_POPULATION = 10
-B_INIT_POPULATION = 10
+A_POPULATION_GROWTH = 0.5
+B_POPULATION_GROWTH = 0.5
+A_INIT_POPULATION = 13
+B_INIT_POPULATION = 13
 
 
 def chance(probability):
@@ -43,9 +42,16 @@ for _ in range(NUMBER_OF_ITERATIONS):
     iteration_food = AMOUNT_OF_FOOD
 
     # Feed food
-    for i in range(0, AMOUNT_OF_FOOD, 2):
+    for i in range(0, iteration_food, 2):
         # 2 units of food to be shared
         two_people = random.choice([(0, 1), (1, 1), (0, 0)])
+        if len(A_population_indices) == 0:
+            two_people = (1, 1)
+        if len(B_population_indices) == 0:
+            two_people = (0, 0)
+        if len(A_population_indices) == 0 and len(B_population_indices) == 0:
+            # everyone got food
+            break
         if two_people == (1, 1):
             try:
                 # Two B's meet
@@ -132,13 +138,24 @@ for _ in range(NUMBER_OF_ITERATIONS):
     A_population = [A() for i in range(A_POPULATION_COUNT)]
     B_population = [B() for i in range(B_POPULATION_COUNT)]
 
-    for i in range(ceil(A_POPULATION_GROWTH * A_POPULATION_COUNT)):
-        A_population.append(A())
-        A_POPULATION_COUNT += 1
+    A_population_indices = [i for i in range(A_POPULATION_COUNT)]
+    B_population_indices = [i for i in range(B_POPULATION_COUNT)]
 
-    for i in range(ceil(B_POPULATION_COUNT * B_POPULATION_GROWTH)):
-        B_population.append(B())
-        B_POPULATION_COUNT += 1
+    temp_A_population_count = A_POPULATION_COUNT
+    temp_B_population_count = B_POPULATION_COUNT
+
+    for i in range(A_POPULATION_COUNT):
+        if A_population[i].food == 2:
+            A_population.append(A())
+            temp_A_population_count += 1
+
+    for i in range(B_POPULATION_COUNT):
+        if B_population[i].food == 2:
+            B_population.append(B())
+            temp_B_population_count += 1
+
+    A_POPULATION_COUNT = temp_A_population_count
+    B_POPULATION_COUNT = temp_B_population_count
 
     print(_, "a_population", A_POPULATION_COUNT)
     print(_, "b_population", B_POPULATION_COUNT)
